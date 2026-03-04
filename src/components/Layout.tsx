@@ -16,13 +16,13 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const { addMeal } = useNutrition();
 
-    const handleImageSelected = async (base64Image: string) => {
-        setIsUploaderOpen(false); // Close the camera immediately
+    const handleMealAdd = async (data: { imageBase64?: string; textDescription?: string }) => {
+        setIsUploaderOpen(false); // Close the modal immediately
         setIsAnalyzing(true);     // Show loading state
 
         try {
             // 1. Send to Gemini
-            const analysis = await GeminiService.analyzeFoodImage(base64Image);
+            const analysis = await GeminiService.analyzeFood(data);
 
             // 2. Format for Google Sheets (adding ID, Date, Time)
             const now = new Date();
@@ -129,7 +129,7 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
 
             {isUploaderOpen && (
                 <ImageUploader
-                    onImageSelected={handleImageSelected}
+                    onMealAdded={handleMealAdd}
                     onCancel={() => setIsUploaderOpen(false)}
                 />
             )}

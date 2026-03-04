@@ -14,21 +14,14 @@ exports.analyzeFood = (0, https_1.onRequest)({
             res.status(405).send("Method Not Allowed");
             return;
         }
-        const { imageBase64 } = req.body;
-        if (!imageBase64) {
-            res.status(400).send("Missing base64 image data.");
+        const { imageBase64, textDescription } = req.body;
+        if (!imageBase64 && !textDescription) {
+            res.status(400).send("Missing image or text description.");
             return;
         }
         const ai = new genai_1.GoogleGenAI({ apiKey: GEMINI_API_KEY.value() });
-        const match = imageBase64.match(/^data:(image\/[a-z]+);base64,(.+)$/);
-        if (!match) {
-            res.status(400).send("Invalid image format.");
-            return;
-        }
-        const mimeType = match[1];
-        const data = match[2];
-        const prompt = `
-            Analyze this image of food. Identify what the meal is and estimate its nutritional value.
+        let prompt = `
+            Analyze this meal. Identify what the meal is and estimate its nutritional value.
             You must return the response as a valid JSON object matching this exact structure:
             {
               "foodName": "A short, descriptive name of the meal (e.g., 'Chicken Salad and Rice')",
@@ -39,17 +32,30 @@ exports.analyzeFood = (0, https_1.onRequest)({
             }
             Do not include any other text, markdown formatting, or explanations. Just the raw JSON object.
         `;
+        const contents = [];
+        if (textDescription) {
+            prompt += `\n\nMeal description provided by user: "${textDescription}"`;
+            contents.push(prompt);
+        }
+        else if (imageBase64) {
+            const match = imageBase64.match(/^data:(image\/[a-z]+);base64,(.+)$/);
+            if (!match) {
+                res.status(400).send("Invalid image format.");
+                return;
+            }
+            const mimeType = match[1];
+            const data = match[2];
+            contents.push(prompt);
+            contents.push({
+                inlineData: {
+                    data: data,
+                    mimeType: mimeType
+                }
+            });
+        }
         const result = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: [
-                prompt,
-                {
-                    inlineData: {
-                        data: data,
-                        mimeType: mimeType
-                    }
-                }
-            ],
+            contents: contents,
             config: {
                 responseMimeType: "application/json",
                 temperature: 0.2,

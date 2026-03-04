@@ -12,17 +12,20 @@ export interface NutritionalAnalysis {
 
 export class GeminiService {
     /**
-     * Analyzes a base64 image of food by calling our secure Cloud Function proxy.
-     * @param base64Image The image data (e.g., "data:image/jpeg;base64,...")
+     * Analyzes a meal by calling our secure Cloud Function proxy.
+     * @param options Provide either a base64Image or a textDescription.
      */
-    static async analyzeFoodImage(imageBase64: string): Promise<NutritionalAnalysis> {
+    static async analyzeFood(options: { imageBase64?: string; textDescription?: string }): Promise<NutritionalAnalysis> {
         try {
             const response = await fetch(CLOUD_FUNCTION_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ imageBase64 }),
+                body: JSON.stringify({
+                    imageBase64: options.imageBase64,
+                    textDescription: options.textDescription
+                }),
             });
 
             if (!response.ok) {

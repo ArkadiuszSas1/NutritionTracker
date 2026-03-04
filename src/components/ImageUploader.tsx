@@ -1,14 +1,15 @@
 import { useState, useRef, useCallback } from 'react';
-import { Camera, Image as ImageIcon, X, RefreshCw } from 'lucide-react';
+import { Camera, Image as ImageIcon, X, RefreshCw, PencilLine } from 'lucide-react';
 
 interface ImageUploaderProps {
-    onImageSelected: (base64Image: string) => void;
+    onMealAdded: (data: { imageBase64?: string; textDescription?: string }) => void;
     onCancel: () => void;
 }
 
-export function ImageUploader({ onImageSelected, onCancel }: ImageUploaderProps) {
+export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
+    const [textInput, setTextInput] = useState('');
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +59,7 @@ export function ImageUploader({ onImageSelected, onCancel }: ImageUploaderProps)
 
                 // Stop camera and pass image up
                 stopCamera();
-                onImageSelected(base64Image);
+                onMealAdded({ imageBase64: base64Image });
             }
         }
     };
@@ -78,7 +79,7 @@ export function ImageUploader({ onImageSelected, onCancel }: ImageUploaderProps)
             const base64Image = event.target?.result as string;
             if (base64Image) {
                 if (isCameraActive) stopCamera();
-                onImageSelected(base64Image);
+                onMealAdded({ imageBase64: base64Image });
             }
         };
         reader.readAsDataURL(file);
@@ -186,6 +187,34 @@ export function ImageUploader({ onImageSelected, onCancel }: ImageUploaderProps)
                             <ImageIcon size={22} className="text-gray-400" />
                             Upload from Gallery
                         </button>
+
+                        <div className="relative flex items-center justify-center py-2">
+                            <div className="absolute inset-x-0 h-px bg-gray-200"></div>
+                            <span className="relative bg-white px-4 text-xs font-semibold text-gray-400 uppercase tracking-widest">OR DESCRIBE MANUALLY</span>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <textarea
+                                value={textInput}
+                                onChange={(e) => setTextInput(e.target.value)}
+                                placeholder="E.g., Chicken salad with rice and a glass of milk"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                                rows={2}
+                            />
+                            <button
+                                onClick={() => {
+                                    if (textInput.trim()) {
+                                        stopCamera();
+                                        onMealAdded({ textDescription: textInput.trim() });
+                                    }
+                                }}
+                                disabled={!textInput.trim()}
+                                className="w-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold py-3 px-6 rounded-xl transition-all flex justify-center items-center gap-2 cursor-pointer"
+                            >
+                                <PencilLine size={20} />
+                                Add by Description
+                            </button>
+                        </div>
                     </div>
 
                 </div>
