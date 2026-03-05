@@ -15,7 +15,7 @@ export class GeminiService {
      * Analyzes a meal by calling our secure Cloud Function proxy.
      * @param options Provide either a base64Image or a textDescription.
      */
-    static async analyzeFood(options: { imageBase64?: string; textDescription?: string }): Promise<NutritionalAnalysis> {
+    static async analyzeFood(options: { imageBase64?: string; text?: string }): Promise<NutritionalAnalysis> {
         try {
             const response = await fetch(CLOUD_FUNCTION_URL, {
                 method: 'POST',
@@ -24,7 +24,7 @@ export class GeminiService {
                 },
                 body: JSON.stringify({
                     imageBase64: options.imageBase64,
-                    textDescription: options.textDescription
+                    text: options.text
                 }),
             });
 

@@ -16,7 +16,7 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const { addMeal } = useNutrition();
 
-    const handleMealAdd = async (data: { imageBase64?: string; textDescription?: string }) => {
+    const handleMealAdd = async (data: { imageBase64?: string; text?: string }) => {
         setIsUploaderOpen(false); // Close the modal immediately
         setIsAnalyzing(true);     // Show loading state
 
@@ -34,7 +34,8 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
                 calories: analysis.calories,
                 protein: analysis.protein,
                 carbs: analysis.carbs,
-                fat: analysis.fat
+                fat: analysis.fat,
+                comment: data.text
             };
 
             // 3. Save to Google Sheets Context
@@ -84,7 +85,14 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
                     />
                 </nav>
 
-                <div className="p-4 border-t border-gray-50">
+                <div className="p-4 space-y-2 border-t border-gray-50">
+                    <button
+                        onClick={() => setIsUploaderOpen(true)}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2 cursor-pointer"
+                    >
+                        <PlusCircle size={20} />
+                        Add Meal
+                    </button>
                     <button onClick={onLogout} className="flex items-center gap-3 w-full px-4 py-3 text-sm font-medium text-gray-500 rounded-xl hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer">
                         <LogOut size={20} />
                         <span>Sign Out</span>
@@ -119,13 +127,6 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
                 </button>
             </div>
 
-            {/* Desktop Add Button (in sidebar) */}
-            <div className="hidden md:block absolute bottom-24 left-4 right-4 z-20">
-                <button onClick={() => setIsUploaderOpen(true)} className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex justify-center items-center gap-2 cursor-pointer">
-                    <PlusCircle size={20} />
-                    Add Meal
-                </button>
-            </div>
 
             {isUploaderOpen && (
                 <ImageUploader

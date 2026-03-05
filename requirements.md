@@ -5,8 +5,8 @@ A web-based application designed to help users track their daily nutrition intak
 
 ## 2. Core Features
 - **Daily Dashboard**: Users can view their total nutritional intake (calories, macros, etc.) for the current day.
-- **Meal Diary**: Users can add distinct meals to their diary.
-- **Historical View**: Users can select specific dates to view past nutritional intake.
+- **Meal Diary**: Users can add distinct meals to their diary, with the ability to include custom comments for context (e.g., "half portion", "200g").
+- **Historical View**: Users can select specific dates to view past nutritional intake and read their previous comments.
 - **Image Capture & Upload**: Users can take a live photo of their meal or upload an existing image from their device gallery.
 
 ## 3. AI & Image Recognition

@@ -68,8 +68,8 @@ export class GoogleSheetsService {
                 console.log(`[GoogleSheetsService] Created new spreadsheet. ID: ${newSpreadsheetId}`);
 
                 console.log('[GoogleSheetsService] Initializing columns headers for the new spreadsheet...');
-                const range = `${MEALS_SHEET_NAME}!A1:H1`;
-                const values = [['ID', 'Date', 'Time', 'Food Name', 'Calories', 'Protein', 'Carbs', 'Fat']];
+                const range = `${MEALS_SHEET_NAME}!A1:I1`;
+                const values = [['ID', 'Date', 'Time', 'Food Name', 'Calories', 'Protein', 'Carbs', 'Fat', 'Comment']];
 
                 await fetch(`${GOOGLE_API_BASE}/${newSpreadsheetId}/values/${range}?valueInputOption=USER_ENTERED`, {
                     method: 'PUT',
@@ -91,7 +91,7 @@ export class GoogleSheetsService {
         if (!this.spreadsheetId) throw new Error('Spreadsheet not initialized');
 
         try {
-            const range = `${MEALS_SHEET_NAME}!A2:H`; // Skip headers
+            const range = `${MEALS_SHEET_NAME}!A2:I`; // Skip headers
             const res = await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${range}`, {
                 headers: this.headers,
             });
@@ -108,6 +108,7 @@ export class GoogleSheetsService {
                 protein: Number(row[5] || 0),
                 carbs: Number(row[6] || 0),
                 fat: Number(row[7] || 0),
+                comment: row[8] || '',
             }));
         } catch (e) {
             console.error('Error getting meals', e);
@@ -120,7 +121,7 @@ export class GoogleSheetsService {
         if (!this.spreadsheetId) throw new Error('Spreadsheet not initialized');
 
         try {
-            const range = `${MEALS_SHEET_NAME}!A:H`;
+            const range = `${MEALS_SHEET_NAME}!A:I`;
             const values = [[
                 meal.id,
                 meal.date,
@@ -129,7 +130,8 @@ export class GoogleSheetsService {
                 meal.calories,
                 meal.protein,
                 meal.carbs,
-                meal.fat
+                meal.fat,
+                meal.comment || ''
             ]];
 
             await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${range}:append?valueInputOption=USER_ENTERED`, {

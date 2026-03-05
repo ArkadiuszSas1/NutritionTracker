@@ -10,4 +10,5 @@ export interface MealEntry {
     protein: number;
     carbs: number;
     fat: number;
+    comment?: string;
 }

@@ -81,8 +81,16 @@ export function Dashboard() {
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl">🍽️</div>
                                     <div>
-                                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{meal.foodName}</h4>
-                                        <p className="text-xs text-gray-500 font-medium">{meal.time}</p>
+                                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors uppercase text-sm tracking-tight">{meal.foodName}</h4>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-xs text-gray-500 font-medium">{meal.time}</p>
+                                            {meal.comment && (
+                                                <>
+                                                    <span className="text-gray-300">•</span>
+                                                    <p className="text-[10px] text-blue-500 font-medium italic truncate max-w-[120px]">"{meal.comment}"</p>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="text-right">

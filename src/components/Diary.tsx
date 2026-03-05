@@ -122,8 +122,16 @@ export function Diary() {
                                         <span className="text-gray-400 z-10 block">🍽️</span>
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-gray-900 text-lg">{meal.foodName}</h4>
-                                        <p className="text-sm font-medium text-gray-500">{meal.time}</p>
+                                        <h4 className="font-bold text-gray-900 text-lg uppercase tracking-tight">{meal.foodName}</h4>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-sm font-medium text-gray-500">{meal.time}</p>
+                                            {meal.comment && (
+                                                <>
+                                                    <span className="text-gray-300">•</span>
+                                                    <p className="text-xs text-indigo-500 font-semibold italic">"{meal.comment}"</p>
+                                                </>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="text-right">
