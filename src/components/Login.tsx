@@ -27,7 +27,7 @@ export function Login({ onSuccess }: LoginProps) {
                         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white font-bold text-4xl shadow-lg mb-4">
                             N
                         </div>
-                        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Tracker</h1>
+                        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Nutrition Tracker</h1>
                         <p className="text-gray-500 font-medium">Your daily nutrition, simplified.</p>
                     </div>
 
