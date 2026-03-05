@@ -35,10 +35,10 @@ Browser (React App)
 This project uses Vite's environment variable system to automatically switch between local development and production.
 
 ### `.env.local` (Development)
-Used when running `npm run dev`. It points to the **Firebase Emulator**.
+Used when running `npm run dev`. It uses a **relative path** (`/analyzeFood`) which the Vite dev server proxies to the local Firebase Emulator over HTTP internally — avoiding the browser's mixed-content block (HTTPS page → HTTP emulator).
 ```env
 VITE_GOOGLE_CLIENT_ID=...
-VITE_CLOUD_FUNCTION_URL=http://127.0.0.1:5001/nutritiontracker-706c4/us-central1/analyzeFood
+VITE_CLOUD_FUNCTION_URL=/analyzeFood
 ```
 
 ### `.env.production` (Production)
@@ -58,20 +58,93 @@ VITE_CLOUD_FUNCTION_URL=https://us-central1-nutritiontracker-706c4.cloudfunction
     npm install --prefix ./functions
     ```
 
-2.  **Start the Firebase Emulators** (in a new terminal):
+2.  **Create `functions/.secret.local`** (one-time setup):
+
+    The Firebase Emulator cannot access Firebase Secret Manager, so you must provide the Gemini API key in a local file. This file is already in `.gitignore` and will never be committed.
+    ```bash
+    firebase functions:secrets:access GEMINI_API_KEY
+    ```
+    Copy the printed key and create the file `functions/.secret.local`:
+    ```env
+    GEMINI_API_KEY=YOUR_KEY_HERE
+    ```
+
+3.  **Start the Firebase Emulators** (in a new terminal):
     ```bash
     firebase emulators:start --only functions
     ```
     *This hosts your Cloud Function locally so your app can call it.*
 
-3.  **Start the React App**:
+4.  **Start the React App**:
     ```bash
     npm run dev
     ```
 
+### How the Vite Proxy Works
+
+Because the dev server uses HTTPS (via `@vitejs/plugin-basic-ssl`, required for camera access on mobile), the browser would normally block requests to the HTTP emulator as "mixed content". To solve this, `vite.config.ts` includes a proxy rule:
+
+```
+Browser (HTTPS) → https://localhost:5173/analyzeFood
+                        ↓  Vite proxy (runs server-side, no browser restriction)
+              http://127.0.0.1:5001/.../analyzeFood  (Firebase Emulator)
+```
+
+The browser only ever talks to the secure Vite server. Vite handles the HTTP hop to the emulator internally.
+
+## Mobile Testing (Local Network)
+
+You can test the app on a physical mobile device over Wi-Fi. Because OAuth and the camera API require HTTPS, a few extra steps are needed.
+
+### Prerequisites
+- Your PC and mobile device must be on the **same Wi-Fi network**.
+- Your PC's local IP address is `192.168.1.156` (run `ipconfig` to confirm if it changes).
+
+### One-time OAuth Setup
+
+Google and Firebase require a valid domain (not a raw IP address) for OAuth. Use the free `nip.io` DNS service, which maps `192.168.1.156.nip.io` → `192.168.1.156` automatically.
+
+**1. Firebase Authorized Domains**
+1. Go to [Firebase Console → Authentication → Settings → Authorized domains](https://console.firebase.google.com/project/nutritiontracker-706c4/authentication/settings).
+2. Click **Add domain** and add: `192.168.1.156.nip.io`
+
+**2. Google Cloud Console**
+1. Go to [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) and open your OAuth 2.0 Web Client ID.
+2. Under **Authorized JavaScript origins**, add: `https://192.168.1.156.nip.io:5173`
+3. Under **Authorized redirect URIs**, ensure this Firebase handler URI is present (it may already be there):
+   ```
+   https://nutritiontracker-706c4.firebaseapp.com/__/auth/handler
+   ```
+4. Click **Save** and wait ~1-2 minutes for the changes to propagate.
+
+### Running the App for Mobile Testing
+
+The dev server is already configured to serve over HTTPS (required for camera access on Android/iOS) and to accept `nip.io` hostnames.
+
+1. **Start the Firebase Emulators** (in a separate terminal):
+   ```bash
+   firebase emulators:start --only functions
+   ```
+
+2. **Start the React App**:
+   ```bash
+   npm run dev
+   ```
+   The server will print `Network: https://192.168.1.156:5173/` — this confirms HTTPS is active.
+
+3. **On your mobile browser**, navigate to:
+   ```
+   https://192.168.1.156.nip.io:5173
+   ```
+
+4. **Accept the certificate warning**: Chrome/Safari will show a "connection not private" warning because the certificate is self-signed. Tap **Advanced → Proceed** to continue. This is safe for local testing.
+
+> **Note:** Your local IP (`192.168.1.156`) may change if your router reassigns it. If the setup stops working, run `ipconfig`, update the `nip.io` address accordingly in Firebase and Google Cloud Console, and update the note above.
+
 ---
 
 ## Deployment Workflow
+
 
 1.  **Build the project**:
     ```bash

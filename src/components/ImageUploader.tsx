@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Camera, Image as ImageIcon, X, RefreshCw, PencilLine } from 'lucide-react';
 
 interface ImageUploaderProps {
@@ -14,6 +14,13 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Assign stream to video element after it renders into the DOM
+    useEffect(() => {
+        if (isCameraActive && videoRef.current && stream) {
+            videoRef.current.srcObject = stream;
+        }
+    }, [isCameraActive, stream]);
+
     // Start Camera
     const startCamera = async () => {
         try {
@@ -22,9 +29,7 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
             });
             setStream(mediaStream);
             setIsCameraActive(true);
-            if (videoRef.current) {
-                videoRef.current.srcObject = mediaStream;
-            }
+            // srcObject is assigned in the useEffect above, after re-render
         } catch (err) {
             console.error('Error accessing camera:', err);
             alert('Could not access camera. Please check permissions or upload from gallery instead.');
