@@ -178,4 +178,48 @@ export class GoogleSheetsService {
             throw e;
         }
     }
+
+    // 5. Update meal by updating its row
+    public async updateMeal(meal: MealEntry): Promise<void> {
+        if (!this.spreadsheetId) throw new Error('Spreadsheet not initialized');
+
+        try {
+            // Find the row index
+            const range = `${MEALS_SHEET_NAME}!A2:A`; // Just fetch IDs
+            const res = await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${range}`, {
+                headers: this.headers,
+            });
+            const data = await res.json();
+            const rows: any[][] = data.values || [];
+
+            const rowIndex = rows.findIndex(row => row[0] === meal.id);
+            if (rowIndex === -1) {
+                console.warn('Meal ID not found for update:', meal.id);
+                return;
+            }
+
+            const sheetRowNumber = rowIndex + 2; // +2 because A2 is index 0
+            const updateRange = `${MEALS_SHEET_NAME}!A${sheetRowNumber}:I${sheetRowNumber}`;
+            const values = [[
+                meal.id,
+                meal.date,
+                meal.time,
+                meal.foodName,
+                meal.calories,
+                meal.protein,
+                meal.carbs,
+                meal.fat,
+                meal.comment || ''
+            ]];
+
+            await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${updateRange}?valueInputOption=USER_ENTERED`, {
+                method: 'PUT',
+                headers: this.headers,
+                body: JSON.stringify({ values }),
+            });
+        } catch (e) {
+            console.error('Error updating meal', e);
+            throw e;
+        }
+    }
 }

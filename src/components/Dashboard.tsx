@@ -3,8 +3,12 @@ import { useNutrition } from '../hooks/useNutrition';
 import { useState, useRef } from 'react';
 import type { MealEntry } from '../types';
 
+import { EditMealModal } from './EditMealModal';
+
 export function Dashboard() {
-    const { meals, isLoading, error, removeMeal } = useNutrition();
+    const { meals, isLoading, error, removeMeal, updateMeal } = useNutrition();
+
+    const [editingMeal, setEditingMeal] = useState<MealEntry | null>(null);
 
     // Calculate today's totals
     const today = new Date().toISOString().split('T')[0];
@@ -27,6 +31,15 @@ export function Dashboard() {
     if (error) {
         return <div className="text-center p-8 text-red-500">{error}</div>;
     }
+
+    const handleSaveMeal = async (updatedMeal: MealEntry) => {
+        try {
+            await updateMeal(updatedMeal);
+            setEditingMeal(null);
+        } catch (err) {
+            alert('Failed to update meal. Please try again.');
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -80,16 +93,24 @@ export function Dashboard() {
                         </div>
                     ) : (
                         todaysMeals.map(meal => (
-                            <MealItem key={meal.id} meal={meal} onRemove={removeMeal} />
+                            <MealItem key={meal.id} meal={meal} onRemove={removeMeal} onEdit={() => setEditingMeal(meal)} />
                         ))
                     )}
                 </div>
             </div>
+
+            {editingMeal && (
+                <EditMealModal
+                    meal={editingMeal}
+                    onSave={handleSaveMeal}
+                    onCancel={() => setEditingMeal(null)}
+                />
+            )}
         </div>
     );
 }
 
-function MealItem({ meal, onRemove }: { meal: MealEntry, onRemove: (id: string) => void }) {
+function MealItem({ meal, onRemove, onEdit }: { meal: MealEntry, onRemove: (id: string) => void, onEdit: () => void }) {
     const [offset, setOffset] = useState(0);
     const [isDeleting, setIsDeleting] = useState(false);
     const startX = useRef(0);
@@ -109,10 +130,8 @@ function MealItem({ meal, onRemove }: { meal: MealEntry, onRemove: (id: string) 
         if (isDeleting || !isDragging.current) return;
         currentX.current = e.clientX;
         const diff = currentX.current - startX.current;
-        if (diff > 0) {
-            // Cap the swipe distance
-            setOffset(Math.min(diff, window.innerWidth));
-        }
+        // Allow swiping left (diff < 0) and right (diff > 0)
+        setOffset(Math.max(-window.innerWidth, Math.min(diff, window.innerWidth)));
     };
 
     const handlePointerUpOrCancel = (e: React.PointerEvent) => {
@@ -125,22 +144,27 @@ function MealItem({ meal, onRemove }: { meal: MealEntry, onRemove: (id: string) 
             // Ignore if pointer capture was already lost
         }
 
-        // Trigger delete if swiped right by more than 100px
         if (offset > 100) {
+            // Swiped right -> Delete
             setIsDeleting(true);
             setOffset(window.innerWidth); // Animate completely off screen
             setTimeout(() => {
                 onRemove(meal.id);
             }, 300); // Wait for transition to finish
+        } else if (offset < -100) {
+            // Swiped left -> Edit
+            setOffset(0); // Snap back
+            onEdit();
         } else {
+            // Not swiped enough
             setOffset(0); // Snap back
         }
     };
 
     return (
-        <div className="relative overflow-hidden rounded-2xl">
-            {/* Background delete area */}
-            <div className="absolute inset-0 bg-red-100 flex items-center px-6">
+        <div className="relative overflow-hidden rounded-2xl bg-gray-100">
+            {/* Background delete area (left side, shows when swiping right) */}
+            <div className="absolute inset-y-0 left-0 bg-red-100 flex items-center px-6" style={{ right: '50%' }}>
                 <span className="text-red-600 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-red-200 flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -148,6 +172,18 @@ function MealItem({ meal, onRemove }: { meal: MealEntry, onRemove: (id: string) 
                         </svg>
                     </div>
                     Delete
+                </span>
+            </div>
+
+            {/* Background edit area (right side, shows when swiping left) */}
+            <div className="absolute inset-y-0 right-0 bg-indigo-100 flex items-center justify-end px-6" style={{ left: '50%' }}>
+                <span className="text-indigo-600 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+                    Edit
+                    <div className="w-8 h-8 rounded-full bg-indigo-200 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </div>
                 </span>
             </div>
 

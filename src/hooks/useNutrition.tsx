@@ -7,6 +7,7 @@ interface NutritionContextType {
     isLoading: boolean;
     error: string | null;
     addMeal: (meal: MealEntry) => Promise<void>;
+    updateMeal: (meal: MealEntry) => Promise<void>;
     removeMeal: (id: string) => Promise<void>;
     refreshMeals: () => Promise<void>;
 }
@@ -89,8 +90,23 @@ export function NutritionProvider({
         }
     }, [service, refreshMeals]);
 
+    const updateMeal = useCallback(async (meal: MealEntry) => {
+        if (!service) throw new Error('Service not initialized');
+
+        // Optimistic UI update
+        setMeals(prev => prev.map(m => m.id === meal.id ? meal : m));
+
+        try {
+            await service.updateMeal(meal);
+        } catch (err) {
+            setError('Failed to update meal.');
+            refreshMeals();
+            throw err;
+        }
+    }, [service, refreshMeals]);
+
     return (
-        <NutritionContext.Provider value={{ meals, isLoading, error, addMeal, removeMeal, refreshMeals }}>
+        <NutritionContext.Provider value={{ meals, isLoading, error, addMeal, updateMeal, removeMeal, refreshMeals }}>
             {children}
         </NutritionContext.Provider>
     );
