@@ -54,8 +54,8 @@ export class GoogleSheetsService {
                 console.log(`[GoogleSheetsService] Found existing spreadsheet. ID: ${existingId}`);
 
                 // Ensure headers are up to date even for existing sheets
-                const range = `${MEALS_SHEET_NAME}!A1:I1`;
-                const values = [['ID', 'Date', 'Time', 'Food Name', 'Calories', 'Protein', 'Carbs', 'Fat', 'Comment']];
+                const range = `${MEALS_SHEET_NAME}!A1:S1`;
+                const values = [['ID', 'Date', 'Time', 'Food Name', 'Calories', 'Protein', 'Carbs', 'Fat', 'Comment', 'NOVA Grade', 'Fiber', 'Net Carbs', 'Added Sugars', 'Saturated Fat', 'Monounsaturated Fat', 'Polyunsaturated Fat', 'Omega-3/6 Ratio', 'GL', 'Energy Impact']];
                 await fetch(`${GOOGLE_API_BASE}/${existingId}/values/${range}?valueInputOption=USER_ENTERED`, {
                     method: 'PUT',
                     headers: this.headers,
@@ -79,8 +79,8 @@ export class GoogleSheetsService {
                 console.log(`[GoogleSheetsService] Created new spreadsheet. ID: ${newSpreadsheetId}`);
 
                 console.log('[GoogleSheetsService] Initializing columns headers for the new spreadsheet...');
-                const range = `${MEALS_SHEET_NAME}!A1:I1`;
-                const values = [['ID', 'Date', 'Time', 'Food Name', 'Calories', 'Protein', 'Carbs', 'Fat', 'Comment']];
+                const range = `${MEALS_SHEET_NAME}!A1:S1`;
+                const values = [['ID', 'Date', 'Time', 'Food Name', 'Calories', 'Protein', 'Carbs', 'Fat', 'Comment', 'NOVA Grade', 'Fiber', 'Net Carbs', 'Added Sugars', 'Saturated Fat', 'Monounsaturated Fat', 'Polyunsaturated Fat', 'Omega-3/6 Ratio', 'GL', 'Energy Impact']];
 
                 await fetch(`${GOOGLE_API_BASE}/${newSpreadsheetId}/values/${range}?valueInputOption=USER_ENTERED`, {
                     method: 'PUT',
@@ -102,7 +102,7 @@ export class GoogleSheetsService {
         if (!this.spreadsheetId) throw new Error('Spreadsheet not initialized');
 
         try {
-            const range = `${MEALS_SHEET_NAME}!A2:I`; // Skip headers
+            const range = `${MEALS_SHEET_NAME}!A2:S`; // Skip headers
             const res = await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${range}`, {
                 headers: this.headers,
             });
@@ -122,6 +122,16 @@ export class GoogleSheetsService {
                     carbs: Number(row[6] || 0),
                     fat: Number(row[7] || 0),
                     comment: row[8] || '',
+                    novaGrade: row[9] ? Number(row[9]) : undefined,
+                    fiber: row[10] ? Number(row[10]) : undefined,
+                    netCarbs: row[11] ? Number(row[11]) : undefined,
+                    addedSugars: row[12] ? Number(row[12]) : undefined,
+                    saturatedFat: row[13] ? Number(row[13]) : undefined,
+                    monounsaturatedFat: row[14] ? Number(row[14]) : undefined,
+                    polyunsaturatedFat: row[15] ? Number(row[15]) : undefined,
+                    omega36Ratio: row[16] || undefined,
+                    glycemicLoad: row[17] ? Number(row[17]) : undefined,
+                    energyImpact: row[18] || undefined,
                 }));
         } catch (e) {
             console.error('Error getting meals', e);
@@ -134,7 +144,7 @@ export class GoogleSheetsService {
         if (!this.spreadsheetId) throw new Error('Spreadsheet not initialized');
 
         try {
-            const range = `${MEALS_SHEET_NAME}!A:I`;
+            const range = `${MEALS_SHEET_NAME}!A:S`;
             const values = [[
                 meal.id,
                 meal.date,
@@ -144,7 +154,17 @@ export class GoogleSheetsService {
                 meal.protein,
                 meal.carbs,
                 meal.fat,
-                meal.comment || ''
+                meal.comment || '',
+                meal.novaGrade ?? '',
+                meal.fiber ?? '',
+                meal.netCarbs ?? '',
+                meal.addedSugars ?? '',
+                meal.saturatedFat ?? '',
+                meal.monounsaturatedFat ?? '',
+                meal.polyunsaturatedFat ?? '',
+                meal.omega36Ratio || '',
+                meal.glycemicLoad ?? '',
+                meal.energyImpact || ''
             ]];
 
             await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${range}:append?valueInputOption=USER_ENTERED`, {
@@ -179,7 +199,7 @@ export class GoogleSheetsService {
 
             const sheetRowNumber = rowIndex + 2; // +2 because A2 is index 0
 
-            const clearRange = `${MEALS_SHEET_NAME}!A${sheetRowNumber}:I${sheetRowNumber}`;
+            const clearRange = `${MEALS_SHEET_NAME}!A${sheetRowNumber}:S${sheetRowNumber}`;
             await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${clearRange}:clear`, {
                 method: 'POST',
                 headers: this.headers,
@@ -210,7 +230,7 @@ export class GoogleSheetsService {
             }
 
             const sheetRowNumber = rowIndex + 2; // +2 because A2 is index 0
-            const updateRange = `${MEALS_SHEET_NAME}!A${sheetRowNumber}:I${sheetRowNumber}`;
+            const updateRange = `${MEALS_SHEET_NAME}!A${sheetRowNumber}:S${sheetRowNumber}`;
             const values = [[
                 meal.id,
                 meal.date,
@@ -220,7 +240,17 @@ export class GoogleSheetsService {
                 meal.protein,
                 meal.carbs,
                 meal.fat,
-                meal.comment || ''
+                meal.comment || '',
+                meal.novaGrade ?? '',
+                meal.fiber ?? '',
+                meal.netCarbs ?? '',
+                meal.addedSugars ?? '',
+                meal.saturatedFat ?? '',
+                meal.monounsaturatedFat ?? '',
+                meal.polyunsaturatedFat ?? '',
+                meal.omega36Ratio || '',
+                meal.glycemicLoad ?? '',
+                meal.energyImpact || ''
             ]];
 
             await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${updateRange}?valueInputOption=USER_ENTERED`, {

@@ -78,7 +78,17 @@ export const analyzeFood = onRequest({
               "calories": number,
               "protein": number,
               "carbs": number,
-              "fat": number
+              "fat": number,
+              "novaGrade": number (1-4, where 1=unprocessed/minimally processed, 4=ultra-processed),
+              "fiber": number,
+              "netCarbs": number,
+              "addedSugars": number,
+              "saturatedFat": number,
+              "monounsaturatedFat": number,
+              "polyunsaturatedFat": number,
+              "omega36Ratio": "string representing ratio e.g. '1:4'",
+              "glycemicLoad": number (estimate),
+              "energyImpact": "string e.g. 'Sustained' or 'Crash' based on macros/sugar"
             }
             Do not include any other text, markdown formatting, or explanations. Just the raw JSON object.
         `;

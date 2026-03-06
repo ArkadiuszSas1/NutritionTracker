@@ -5,22 +5,21 @@ Nutrition App Column Definitions
 - protein
 - carbs
 - fat
+- date and time
+- comment
 
-date and time is saved in "Nutrition Tracker Data" but user does not see it. 
+# new tracking requirements
 
-# new reqirement
+## new columns
+- NOVA Grade: A classification (1-4) for the level of food processing (1 = whole, 4 = ultra-processed).
+- breakdown carbs to Fiber, Net Carbs, Added Sugars
+- breakdown fat to Saturated, Monounsaturated, and Polyunsaturated fats and  ratio of Omega-3/6
+- Glycemic Load (GL): An estimate of how much the portion will raise blood glucose levels.
+- Energy Impact: Qualitative note on whether the meal led to sustained energy or a crash.
 
-Date and Time of the meal should be editable
+## other
+- application should add missing columns to the google sheet
+- should handle historical entries that do not have all the new columns
 
-When adding new entry then defaulting to 
-- JPEG exif date and time
-- if no exif date and time then current date and time
-When adding from camera then current date and time
-
-also.. date and time should always use format: yyyy-MM-dd HH:mm:ss
-
-# bugs 
-## Nutrition Tracker Data 
-
-File does not have column header for comments
-App should add new column headers because surely new tracked things will be added in the future
+# front page
+- add infor to explain the app purpose and what is being tracked

@@ -123,8 +123,25 @@ export function Diary() {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-gray-900 text-lg uppercase tracking-tight">{meal.foodName}</h4>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap mt-1">
                                             <p className="text-sm font-medium text-gray-500">{meal.time}</p>
+                                            {meal.novaGrade && (() => {
+                                                const label = meal.novaGrade <= 1.5 ? 'Unprocessed' : meal.novaGrade <= 2.5 ? 'Lightly Processed' : meal.novaGrade <= 3.5 ? 'Moderately Processed' : 'Ultra-Processed';
+                                                const dot = meal.novaGrade <= 1.5 ? 'bg-green-500' : meal.novaGrade <= 2.5 ? 'bg-lime-500' : meal.novaGrade <= 3.5 ? 'bg-orange-400' : 'bg-red-500';
+                                                return (
+                                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 ${meal.novaGrade <= 2 ? 'bg-green-100 text-green-700' :
+                                                        meal.novaGrade === 3 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                                                        }`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${dot}`}></span>
+                                                        {label}
+                                                    </span>
+                                                );
+                                            })()}
+                                            {meal.energyImpact && (
+                                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 uppercase tracking-wider">
+                                                    {meal.energyImpact}
+                                                </span>
+                                            )}
                                             {meal.comment && (
                                                 <>
                                                     <span className="text-gray-300">•</span>

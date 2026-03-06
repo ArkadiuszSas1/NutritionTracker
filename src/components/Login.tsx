@@ -28,7 +28,18 @@ export function Login({ onSuccess }: LoginProps) {
                             N
                         </div>
                         <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Nutrition Tracker</h1>
-                        <p className="text-gray-500 font-medium">Your daily nutrition, simplified.</p>
+                        <p className="text-gray-500 font-medium text-sm">Your daily nutrition, analyzed with AI.</p>
+
+                        <div className="text-left bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
+                            <h2 className="text-sm font-semibold text-gray-800 mb-2">What we track:</h2>
+                            <ul className="text-xs text-gray-600 space-y-1.5 list-disc pl-4 marker:text-blue-500">
+                                <li><strong>Macros:</strong> Calories, Protein, Carbs, Fat</li>
+                                <li><strong>Carbs info:</strong> Fiber, Net Carbs, Added Sugars</li>
+                                <li><strong>Fat info:</strong> Sat/Mono/Poly, Omega-3/6</li>
+                                <li><strong>Quality:</strong> NOVA Grade (1-4), Glycemic Load</li>
+                                <li><strong>Impact:</strong> Energy Level estimates</li>
+                            </ul>
+                        </div>
                     </div>
 
                     <div className="pt-4">

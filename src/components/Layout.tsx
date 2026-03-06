@@ -60,7 +60,17 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
                 protein: editedResult.protein,
                 carbs: editedResult.carbs,
                 fat: editedResult.fat,
-                comment: editedResult.comment
+                comment: editedResult.comment,
+                novaGrade: editedResult.novaGrade,
+                fiber: editedResult.fiber,
+                netCarbs: editedResult.netCarbs,
+                addedSugars: editedResult.addedSugars,
+                saturatedFat: editedResult.saturatedFat,
+                monounsaturatedFat: editedResult.monounsaturatedFat,
+                polyunsaturatedFat: editedResult.polyunsaturatedFat,
+                omega36Ratio: editedResult.omega36Ratio,
+                glycemicLoad: editedResult.glycemicLoad,
+                energyImpact: editedResult.energyImpact
             };
 
             // Save to Google Sheets Context

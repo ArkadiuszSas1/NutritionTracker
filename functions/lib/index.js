@@ -69,7 +69,17 @@ exports.analyzeFood = (0, https_1.onRequest)({
               "calories": number,
               "protein": number,
               "carbs": number,
-              "fat": number
+              "fat": number,
+              "novaGrade": number (1-4, where 1=unprocessed/minimally processed, 4=ultra-processed),
+              "fiber": number,
+              "netCarbs": number,
+              "addedSugars": number,
+              "saturatedFat": number,
+              "monounsaturatedFat": number,
+              "polyunsaturatedFat": number,
+              "omega36Ratio": "string representing ratio e.g. '1:4'",
+              "glycemicLoad": number (estimate),
+              "energyImpact": "string e.g. 'Sustained' or 'Crash' based on macros/sugar"
             }
             Do not include any other text, markdown formatting, or explanations. Just the raw JSON object.
         `;
@@ -92,7 +102,7 @@ exports.analyzeFood = (0, https_1.onRequest)({
         }
         console.log("Calling Gemini with parts count:", parts.length);
         const result = await ai.models.generateContent({
-            model: "gemini-3.1-flash-lite-preview", //do not change model name, it is verified to be correct
+            model: "gemini-3.1-flash-lite-preview",
             contents: [{ role: "user", parts }],
             config: {
                 responseMimeType: "application/json",

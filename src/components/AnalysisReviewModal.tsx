@@ -11,6 +11,16 @@ interface AnalysisReviewModalProps {
         carbs: number;
         fat: number;
         comment?: string;
+        novaGrade?: number;
+        fiber?: number;
+        netCarbs?: number;
+        addedSugars?: number;
+        saturatedFat?: number;
+        monounsaturatedFat?: number;
+        polyunsaturatedFat?: number;
+        omega36Ratio?: string;
+        glycemicLoad?: number;
+        energyImpact?: string;
     };
     onApprove: (data: {
         date: string;
@@ -21,6 +31,16 @@ interface AnalysisReviewModalProps {
         carbs: number;
         fat: number;
         comment?: string;
+        novaGrade?: number;
+        fiber?: number;
+        netCarbs?: number;
+        addedSugars?: number;
+        saturatedFat?: number;
+        monounsaturatedFat?: number;
+        polyunsaturatedFat?: number;
+        omega36Ratio?: string;
+        glycemicLoad?: number;
+        energyImpact?: string;
     }) => void;
     onReject: () => void;
 }
@@ -34,6 +54,16 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
     const [carbs, setCarbs] = useState(initialData.carbs?.toString() || '0');
     const [fat, setFat] = useState(initialData.fat?.toString() || '0');
     const [comment, setComment] = useState(initialData.comment || '');
+    const [novaGrade, setNovaGrade] = useState(initialData.novaGrade?.toString() || '');
+    const [fiber, setFiber] = useState(initialData.fiber?.toString() || '');
+    const [netCarbs, setNetCarbs] = useState(initialData.netCarbs?.toString() || '');
+    const [addedSugars, setAddedSugars] = useState(initialData.addedSugars?.toString() || '');
+    const [saturatedFat, setSaturatedFat] = useState(initialData.saturatedFat?.toString() || '');
+    const [monounsaturatedFat, setMonounsaturatedFat] = useState(initialData.monounsaturatedFat?.toString() || '');
+    const [polyunsaturatedFat, setPolyunsaturatedFat] = useState(initialData.polyunsaturatedFat?.toString() || '');
+    const [omega36Ratio, setOmega36Ratio] = useState(initialData.omega36Ratio || '');
+    const [glycemicLoad, setGlycemicLoad] = useState(initialData.glycemicLoad?.toString() || '');
+    const [energyImpact, setEnergyImpact] = useState(initialData.energyImpact || '');
 
     const handleApprove = () => {
         onApprove({
@@ -45,6 +75,16 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
             carbs: Number(carbs) || 0,
             fat: Number(fat) || 0,
             comment: comment.trim() || undefined,
+            novaGrade: novaGrade ? Number(novaGrade) : undefined,
+            fiber: fiber ? Number(fiber) : undefined,
+            netCarbs: netCarbs ? Number(netCarbs) : undefined,
+            addedSugars: addedSugars ? Number(addedSugars) : undefined,
+            saturatedFat: saturatedFat ? Number(saturatedFat) : undefined,
+            monounsaturatedFat: monounsaturatedFat ? Number(monounsaturatedFat) : undefined,
+            polyunsaturatedFat: polyunsaturatedFat ? Number(polyunsaturatedFat) : undefined,
+            omega36Ratio: omega36Ratio.trim() || undefined,
+            glycemicLoad: glycemicLoad ? Number(glycemicLoad) : undefined,
+            energyImpact: energyImpact.trim() || undefined,
         });
     };
 
@@ -140,6 +180,60 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
                             className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                             rows={2}
                         />
+                    </div>
+
+                    <h4 className="text-sm font-bold text-gray-700 mt-4 border-b border-gray-100 pb-1">Detailed Nutrition</h4>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">NOVA Grade (1-4)</label>
+                            <input type="number" min="1" max="4" value={novaGrade} onChange={(e) => setNovaGrade(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Glycemic Load</label>
+                            <input type="number" value={glycemicLoad} onChange={(e) => setGlycemicLoad(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Fiber (g)</label>
+                            <input type="number" value={fiber} onChange={(e) => setFiber(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-gray-700 text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Net Carbs (g)</label>
+                            <input type="number" value={netCarbs} onChange={(e) => setNetCarbs(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-gray-700 text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Added Sugar (g)</label>
+                            <input type="number" value={addedSugars} onChange={(e) => setAddedSugars(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-gray-700 text-sm" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Sat Fat (g)</label>
+                            <input type="number" value={saturatedFat} onChange={(e) => setSaturatedFat(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-gray-700 text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Mono Fat (g)</label>
+                            <input type="number" value={monounsaturatedFat} onChange={(e) => setMonounsaturatedFat(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-gray-700 text-sm" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Poly Fat (g)</label>
+                            <input type="number" value={polyunsaturatedFat} onChange={(e) => setPolyunsaturatedFat(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-2 text-gray-700 text-sm" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Omega 3:6</label>
+                            <input type="text" placeholder="e.g. 1:4" value={omega36Ratio} onChange={(e) => setOmega36Ratio(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700" />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Energy Impact</label>
+                            <input type="text" placeholder="e.g. Sustained" value={energyImpact} onChange={(e) => setEnergyImpact(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700" />
+                        </div>
                     </div>
                 </div>
 
