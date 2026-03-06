@@ -204,7 +204,7 @@ function MealItem({ meal, onRemove, onEdit }: { meal: MealEntry, onRemove: (id: 
                     <div>
                         <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors uppercase text-sm tracking-tight">{meal.foodName}</h4>
                         <div className="flex items-center gap-2">
-                            <p className="text-xs text-gray-500 font-medium">{meal.time}</p>
+                            <p className="text-xs text-gray-500 font-medium">{meal.time.slice(0, 5)}</p>
                             {meal.comment && (
                                 <>
                                     <span className="text-gray-300">•</span>

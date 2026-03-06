@@ -50,8 +50,19 @@ export class GoogleSheetsService {
             console.log('[GoogleSheetsService] Search results:', searchData);
 
             if (searchData.files && searchData.files.length > 0) {
-                console.log(`[GoogleSheetsService] Found existing spreadsheet. ID: ${searchData.files[0].id}`);
-                return searchData.files[0].id; // Return the ID to resolve the static promise
+                const existingId = searchData.files[0].id;
+                console.log(`[GoogleSheetsService] Found existing spreadsheet. ID: ${existingId}`);
+
+                // Ensure headers are up to date even for existing sheets
+                const range = `${MEALS_SHEET_NAME}!A1:I1`;
+                const values = [['ID', 'Date', 'Time', 'Food Name', 'Calories', 'Protein', 'Carbs', 'Fat', 'Comment']];
+                await fetch(`${GOOGLE_API_BASE}/${existingId}/values/${range}?valueInputOption=USER_ENTERED`, {
+                    method: 'PUT',
+                    headers: this.headers,
+                    body: JSON.stringify({ values }),
+                });
+
+                return existingId; // Return the ID to resolve the static promise
             } else {
                 console.log('[GoogleSheetsService] No existing spreadsheet found. Creating a new one...');
                 const createRes = await fetch(GOOGLE_API_BASE, {

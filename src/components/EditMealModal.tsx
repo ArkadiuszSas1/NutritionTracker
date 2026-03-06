@@ -9,6 +9,8 @@ interface EditMealModalProps {
 }
 
 export function EditMealModal({ meal, onSave, onCancel }: EditMealModalProps) {
+    const [date, setDate] = useState(meal.date);
+    const [time, setTime] = useState(meal.time);
     const [foodName, setFoodName] = useState(meal.foodName);
     const [calories, setCalories] = useState(meal.calories?.toString() || '0');
     const [protein, setProtein] = useState(meal.protein?.toString() || '0');
@@ -19,6 +21,8 @@ export function EditMealModal({ meal, onSave, onCancel }: EditMealModalProps) {
     const handleSave = () => {
         onSave({
             ...meal,
+            date,
+            time,
             foodName,
             calories: Number(calories) || 0,
             protein: Number(protein) || 0,
@@ -39,7 +43,29 @@ export function EditMealModal({ meal, onSave, onCancel }: EditMealModalProps) {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
-                    <div className="space-y-1">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Date</label>
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Time</label>
+                            <input
+                                type="time"
+                                step="1"
+                                value={time}
+                                onChange={(e) => setTime(e.target.value)}
+                                className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1 mt-2">
                         <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Food Name</label>
                         <input
                             type="text"

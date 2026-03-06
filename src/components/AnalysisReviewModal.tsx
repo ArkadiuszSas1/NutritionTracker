@@ -3,6 +3,8 @@ import { X, Check } from 'lucide-react';
 
 interface AnalysisReviewModalProps {
     initialData: {
+        date: string;
+        time: string;
         foodName: string;
         calories: number;
         protein: number;
@@ -11,6 +13,8 @@ interface AnalysisReviewModalProps {
         comment?: string;
     };
     onApprove: (data: {
+        date: string;
+        time: string;
         foodName: string;
         calories: number;
         protein: number;
@@ -22,6 +26,8 @@ interface AnalysisReviewModalProps {
 }
 
 export function AnalysisReviewModal({ initialData, onApprove, onReject }: AnalysisReviewModalProps) {
+    const [date, setDate] = useState(initialData.date);
+    const [time, setTime] = useState(initialData.time);
     const [foodName, setFoodName] = useState(initialData.foodName);
     const [calories, setCalories] = useState(initialData.calories?.toString() || '0');
     const [protein, setProtein] = useState(initialData.protein?.toString() || '0');
@@ -31,6 +37,8 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
 
     const handleApprove = () => {
         onApprove({
+            date,
+            time,
             foodName,
             calories: Number(calories) || 0,
             protein: Number(protein) || 0,
@@ -53,7 +61,29 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
                 <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-4">
                     <p className="text-sm text-gray-500 mb-2">Review and correct the AI's estimation before adding it to your diary.</p>
 
-                    <div className="space-y-1">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Date</label>
+                            <input
+                                type="date"
+                                value={date}
+                                onChange={(e) => setDate(e.target.value)}
+                                className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Time</label>
+                            <input
+                                type="time"
+                                step="1"
+                                value={time}
+                                onChange={(e) => setTime(e.target.value)}
+                                className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-1 mt-2">
                         <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Food Name</label>
                         <input
                             type="text"

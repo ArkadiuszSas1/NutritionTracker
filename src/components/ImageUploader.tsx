@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { Camera, Image as ImageIcon, X, RefreshCw, Send, Check } from 'lucide-react';
+import exifr from 'exifr';
 
 interface ImageUploaderProps {
-    onMealAdded: (data: { imageBase64?: string; text?: string }) => void;
+    onMealAdded: (data: { imageBase64?: string; text?: string; date?: string; time?: string }) => void;
     onCancel: () => void;
 }
 
@@ -10,6 +11,8 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [extractedDate, setExtractedDate] = useState<string | undefined>(undefined);
+    const [extractedTime, setExtractedTime] = useState<string | undefined>(undefined);
     const [userInput, setUserInput] = useState('');
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -65,13 +68,33 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
     };
 
     // Handle File Upload
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         if (!file.type.startsWith('image/')) {
             alert('Please select an image file.');
             return;
+        }
+
+        try {
+            const exifData = await exifr.parse(file);
+            if (exifData?.DateTimeOriginal) {
+                // EXIF DateTimeOriginal is usually a Date object or parsable string depending on exifr version
+                const dt = new Date(exifData.DateTimeOriginal);
+                // Ensure valid date
+                if (!isNaN(dt.getTime())) {
+                    setExtractedDate(dt.toISOString().split('T')[0]);
+                    setExtractedTime(dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
+                }
+            } else {
+                setExtractedDate(undefined);
+                setExtractedTime(undefined);
+            }
+        } catch (err) {
+            console.warn('Could not read EXIF data', err);
+            setExtractedDate(undefined);
+            setExtractedTime(undefined);
         }
 
         const reader = new FileReader();
@@ -94,7 +117,7 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
 
     const handleApproveImage = () => {
         if (previewImage) {
-            onMealAdded({ imageBase64: previewImage, text: userInput.trim() });
+            onMealAdded({ imageBase64: previewImage, text: userInput.trim(), date: extractedDate, time: extractedTime });
         }
     };
 

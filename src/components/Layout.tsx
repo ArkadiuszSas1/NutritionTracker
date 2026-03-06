@@ -18,7 +18,7 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
     const [pendingAnalysisResult, setPendingAnalysisResult] = useState<any | null>(null);
     const { addMeal } = useNutrition();
 
-    const handleMealAdd = async (data: { imageBase64?: string; text?: string }) => {
+    const handleMealAdd = async (data: { imageBase64?: string; text?: string; date?: string; time?: string }) => {
         setIsUploaderOpen(false); // Close the modal immediately
         setIsAnalyzing(true);     // Show loading state
 
@@ -26,9 +26,15 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
             // 1. Send to Gemini
             const analysis = await GeminiService.analyzeFood(data);
 
+            const now = new Date();
+            const fallbackDate = now.toISOString().split('T')[0];
+            const fallbackTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
             // 2. Wait for user review instead of adding immediately
             setPendingAnalysisResult({
                 ...analysis,
+                date: data.date || fallbackDate,
+                time: data.time || fallbackTime,
                 comment: data.text || ''
             });
 
@@ -45,11 +51,10 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
 
         try {
             // Format for Google Sheets (adding ID, Date, Time)
-            const now = new Date();
             const newMeal = {
                 id: crypto.randomUUID(),
-                date: now.toISOString().split('T')[0],
-                time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                date: editedResult.date,
+                time: editedResult.time,
                 foodName: editedResult.foodName,
                 calories: editedResult.calories,
                 protein: editedResult.protein,
