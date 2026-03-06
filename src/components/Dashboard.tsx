@@ -120,16 +120,26 @@ export function Dashboard() {
                 {/* Subtle background decoration */}
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
 
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
-                    <div className="text-center md:text-left space-y-1">
-                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">Calories Eaten</p>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 w-full">
+                    {/* Left: Calories Eaten */}
+                    <div className="text-center md:text-left space-y-1 md:w-1/4">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Calories Eaten</p>
                         <div className="flex items-baseline justify-center md:justify-start gap-1 text-gray-900">
                             <span className="text-5xl font-extrabold tracking-tighter">{Math.round(totals.calories)}</span>
-                            <span className="text-lg font-medium text-gray-400">/ {GOALS.calories}</span>
+                            <span className="text-lg font-medium text-gray-300">/ {GOALS.calories}</span>
                         </div>
                     </div>
 
-                    {/* Circular Progress */}
+                    {/* Center: Macros (Protein, Carbs, Fat) */}
+                    <div className="flex-1 w-full max-w-sm">
+                        <div className="flex flex-col gap-2">
+                            <MacroCard label="Protein" current={totals.protein} target={GOALS.protein} colorClass="bg-red-50" fillClass="bg-red-500" textClass="text-red-700" />
+                            <MacroCard label="Carbs" current={totals.carbs} target={GOALS.carbs} colorClass="bg-yellow-50" fillClass="bg-yellow-500" textClass="text-yellow-700" />
+                            <MacroCard label="Fat" current={totals.fat} target={GOALS.fat} colorClass="bg-purple-50" fillClass="bg-purple-500" textClass="text-purple-700" />
+                        </div>
+                    </div>
+
+                    {/* Right: Circular Progress */}
                     {(() => {
                         const radius = 52;
                         const circumference = 2 * Math.PI * radius;
@@ -137,38 +147,33 @@ export function Dashboard() {
                         const offset = circumference * (1 - pct);
                         const overBudget = totals.calories > GOALS.calories;
                         return (
-                            <div className="w-32 h-32 relative flex items-center justify-center">
-                                <svg className="w-full h-full" viewBox="0 0 120 120">
-                                    {/* Background track */}
-                                    <circle cx="60" cy="60" r={radius} fill="none" stroke="#f3f4f6" strokeWidth="10" />
-                                    {/* Filled arc */}
-                                    <circle
-                                        cx="60" cy="60" r={radius}
-                                        fill="none"
-                                        stroke={overBudget ? '#ef4444' : '#3b82f6'}
-                                        strokeWidth="10"
-                                        strokeLinecap="round"
-                                        strokeDasharray={circumference}
-                                        strokeDashoffset={offset}
-                                        transform="rotate(-90 60 60)"
-                                        style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-                                    />
-                                </svg>
-                                <div className="absolute text-center">
-                                    <span className="block text-2xl font-bold text-gray-800 pb-1">{Math.max(0, GOALS.calories - Math.round(totals.calories))}</span>
-                                    <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Left</span>
+                            <div className="md:w-1/4 flex justify-center md:justify-end">
+                                <div className="w-32 h-32 relative flex items-center justify-center">
+                                    <svg className="w-full h-full" viewBox="0 0 120 120">
+                                        {/* Background track */}
+                                        <circle cx="60" cy="60" r={radius} fill="none" stroke="#f8fafc" strokeWidth="10" />
+                                        {/* Filled arc */}
+                                        <circle
+                                            cx="60" cy="60" r={radius}
+                                            fill="none"
+                                            stroke={overBudget ? '#ef4444' : '#3b82f6'}
+                                            strokeWidth="10"
+                                            strokeLinecap="round"
+                                            strokeDasharray={circumference}
+                                            strokeDashoffset={offset}
+                                            transform="rotate(-90 60 60)"
+                                            style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                                        />
+                                    </svg>
+                                    <div className="absolute text-center">
+                                        <span className="block text-2xl font-bold text-gray-800 pb-1">{Math.max(0, GOALS.calories - Math.round(totals.calories))}</span>
+                                        <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Left</span>
+                                    </div>
                                 </div>
                             </div>
                         );
                     })()}
                 </div>
-            </div>
-
-            {/* Macros */}
-            <div className="grid grid-cols-3 gap-3">
-                <MacroCard label="Protein" current={totals.protein} target={GOALS.protein} colorClass="bg-red-50" fillClass="bg-red-500" textClass="text-red-700" />
-                <MacroCard label="Carbs" current={totals.carbs} target={GOALS.carbs} colorClass="bg-yellow-50" fillClass="bg-yellow-500" textClass="text-yellow-700" />
-                <MacroCard label="Fat" current={totals.fat} target={GOALS.fat} colorClass="bg-purple-50" fillClass="bg-purple-500" textClass="text-purple-700" />
             </div>
 
             {/* Detailed Breakdown */}
@@ -354,16 +359,16 @@ function MacroCard({ label, current, target, colorClass, fillClass, textClass }:
     const percentage = Math.min((current / target) * 100, 100);
 
     return (
-        <div className={`p-4 rounded-2xl flex flex-col justify-between h-28 ${colorClass}`}>
-            <span className={`text-xs font-bold uppercase tracking-wider ${textClass}`}>{label}</span>
-            <div>
-                <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-xl font-bold text-gray-900">{Math.round(current)}</span>
-                    <span className="text-xs font-semibold text-gray-500">/ {target}g</span>
+        <div className={`px-4 py-2 rounded-xl flex items-center justify-between gap-4 ${colorClass}`}>
+            <div className="flex flex-col min-w-[70px]">
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${textClass}`}>{label}</span>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-sm font-bold text-gray-900">{Math.round(current)}</span>
+                    <span className="text-[10px] font-semibold text-gray-400">/ {target}g</span>
                 </div>
-                <div className="h-1.5 w-full bg-white/60 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${fillClass}`} style={{ width: `${percentage}%` }}></div>
-                </div>
+            </div>
+            <div className="flex-1 h-2 bg-white/60 rounded-full overflow-hidden">
+                <div className={`h-full rounded-full ${fillClass}`} style={{ width: `${percentage}%` }}></div>
             </div>
         </div>
     );
