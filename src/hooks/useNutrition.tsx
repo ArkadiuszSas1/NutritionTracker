@@ -7,6 +7,7 @@ interface NutritionContextType {
     isLoading: boolean;
     error: string | null;
     addMeal: (meal: MealEntry) => Promise<void>;
+    removeMeal: (id: string) => Promise<void>;
     refreshMeals: () => Promise<void>;
 }
 
@@ -74,8 +75,22 @@ export function NutritionProvider({
         }
     }, [service]);
 
+    const removeMeal = useCallback(async (id: string) => {
+        if (!service) throw new Error('Service not initialized');
+
+        setMeals(prev => prev.filter(m => m.id !== id));
+
+        try {
+            await service.deleteMeal(id);
+        } catch (err) {
+            setError('Failed to delete meal.');
+            refreshMeals();
+            throw err;
+        }
+    }, [service, refreshMeals]);
+
     return (
-        <NutritionContext.Provider value={{ meals, isLoading, error, addMeal, refreshMeals }}>
+        <NutritionContext.Provider value={{ meals, isLoading, error, addMeal, removeMeal, refreshMeals }}>
             {children}
         </NutritionContext.Provider>
     );

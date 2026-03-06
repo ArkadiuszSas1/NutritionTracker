@@ -99,17 +99,19 @@ export class GoogleSheetsService {
             const data = await res.json();
             const rows: any[][] = data.values || [];
 
-            return rows.map(row => ({
-                id: row[0],
-                date: row[1],
-                time: row[2],
-                foodName: row[3],
-                calories: Number(row[4] || 0),
-                protein: Number(row[5] || 0),
-                carbs: Number(row[6] || 0),
-                fat: Number(row[7] || 0),
-                comment: row[8] || '',
-            }));
+            return rows
+                .filter(row => row && row.length > 0 && row[0])
+                .map(row => ({
+                    id: row[0],
+                    date: row[1],
+                    time: row[2],
+                    foodName: row[3],
+                    calories: Number(row[4] || 0),
+                    protein: Number(row[5] || 0),
+                    carbs: Number(row[6] || 0),
+                    fat: Number(row[7] || 0),
+                    comment: row[8] || '',
+                }));
         } catch (e) {
             console.error('Error getting meals', e);
             return [];
@@ -141,6 +143,38 @@ export class GoogleSheetsService {
             });
         } catch (e) {
             console.error('Error adding meal', e);
+            throw e;
+        }
+    }
+
+    // 4. Delete meal by clearing its row
+    public async deleteMeal(id: string): Promise<void> {
+        if (!this.spreadsheetId) throw new Error('Spreadsheet not initialized');
+
+        try {
+            // Find the row index
+            const range = `${MEALS_SHEET_NAME}!A2:A`; // Just fetch IDs
+            const res = await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${range}`, {
+                headers: this.headers,
+            });
+            const data = await res.json();
+            const rows: any[][] = data.values || [];
+
+            const rowIndex = rows.findIndex(row => row[0] === id);
+            if (rowIndex === -1) {
+                console.warn('Meal ID not found for deletion:', id);
+                return;
+            }
+
+            const sheetRowNumber = rowIndex + 2; // +2 because A2 is index 0
+
+            const clearRange = `${MEALS_SHEET_NAME}!A${sheetRowNumber}:I${sheetRowNumber}`;
+            await fetch(`${GOOGLE_API_BASE}/${this.spreadsheetId}/values/${clearRange}:clear`, {
+                method: 'POST',
+                headers: this.headers,
+            });
+        } catch (e) {
+            console.error('Error deleting meal', e);
             throw e;
         }
     }

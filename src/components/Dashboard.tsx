@@ -1,7 +1,10 @@
 import { useNutrition } from '../hooks/useNutrition';
 
+import { useState, useRef } from 'react';
+import type { MealEntry } from '../types';
+
 export function Dashboard() {
-    const { meals, isLoading, error } = useNutrition();
+    const { meals, isLoading, error, removeMeal } = useNutrition();
 
     // Calculate today's totals
     const today = new Date().toISOString().split('T')[0];
@@ -77,29 +80,107 @@ export function Dashboard() {
                         </div>
                     ) : (
                         todaysMeals.map(meal => (
-                            <div key={meal.id} className="bg-white p-4 rounded-2xl shadow-sm border border-gray-50 flex items-center justify-between group hover:shadow-md transition-shadow cursor-pointer">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl">🍽️</div>
-                                    <div>
-                                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors uppercase text-sm tracking-tight">{meal.foodName}</h4>
-                                        <div className="flex items-center gap-2">
-                                            <p className="text-xs text-gray-500 font-medium">{meal.time}</p>
-                                            {meal.comment && (
-                                                <>
-                                                    <span className="text-gray-300">•</span>
-                                                    <p className="text-[10px] text-blue-500 font-medium italic truncate max-w-[120px]">"{meal.comment}"</p>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="font-bold text-gray-900 block">{meal.calories}</span>
-                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">kcal</span>
-                                </div>
-                            </div>
+                            <MealItem key={meal.id} meal={meal} onRemove={removeMeal} />
                         ))
                     )}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function MealItem({ meal, onRemove }: { meal: MealEntry, onRemove: (id: string) => void }) {
+    const [offset, setOffset] = useState(0);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const startX = useRef(0);
+    const currentX = useRef(0);
+    const isDragging = useRef(false);
+
+    const handlePointerDown = (e: React.PointerEvent) => {
+        if (isDeleting) return;
+        isDragging.current = true;
+        startX.current = e.clientX;
+        currentX.current = e.clientX;
+        // Optionally capture pointer to keep receiving events even if cursor leaves element
+        (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    };
+
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (isDeleting || !isDragging.current) return;
+        currentX.current = e.clientX;
+        const diff = currentX.current - startX.current;
+        if (diff > 0) {
+            // Cap the swipe distance
+            setOffset(Math.min(diff, window.innerWidth));
+        }
+    };
+
+    const handlePointerUpOrCancel = (e: React.PointerEvent) => {
+        if (isDeleting || !isDragging.current) return;
+        isDragging.current = false;
+
+        try {
+            (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+        } catch (err) {
+            // Ignore if pointer capture was already lost
+        }
+
+        // Trigger delete if swiped right by more than 100px
+        if (offset > 100) {
+            setIsDeleting(true);
+            setOffset(window.innerWidth); // Animate completely off screen
+            setTimeout(() => {
+                onRemove(meal.id);
+            }, 300); // Wait for transition to finish
+        } else {
+            setOffset(0); // Snap back
+        }
+    };
+
+    return (
+        <div className="relative overflow-hidden rounded-2xl">
+            {/* Background delete area */}
+            <div className="absolute inset-0 bg-red-100 flex items-center px-6">
+                <span className="text-red-600 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-red-200 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </div>
+                    Delete
+                </span>
+            </div>
+
+            <div
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUpOrCancel}
+                onPointerCancel={handlePointerUpOrCancel}
+                style={{
+                    transform: `translateX(${offset}px)`,
+                    transition: offset === 0 || isDeleting ? 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)' : 'none',
+                    touchAction: 'pan-y' // Prevent vertical scrolling from interfering horizontally on some touch devices, but keep vertical scroll working
+                }}
+                className={`bg-white p-4 rounded-2xl shadow-sm border border-gray-50 flex items-center justify-between group cursor-pointer relative z-10 select-none ${isDeleting ? 'opacity-0 transition-opacity duration-300' : ''}`}
+            >
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-xl flex items-center justify-center text-xl">🍽️</div>
+                    <div>
+                        <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors uppercase text-sm tracking-tight">{meal.foodName}</h4>
+                        <div className="flex items-center gap-2">
+                            <p className="text-xs text-gray-500 font-medium">{meal.time}</p>
+                            {meal.comment && (
+                                <>
+                                    <span className="text-gray-300">•</span>
+                                    <p className="text-[10px] text-blue-500 font-medium italic truncate max-w-[120px]">"{meal.comment}"</p>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className="text-right">
+                    <span className="font-bold text-gray-900 block">{meal.calories}</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">kcal</span>
                 </div>
             </div>
         </div>

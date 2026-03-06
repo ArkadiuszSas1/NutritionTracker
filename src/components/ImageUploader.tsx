@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Camera, Image as ImageIcon, X, RefreshCw, Send } from 'lucide-react';
+import { Camera, Image as ImageIcon, X, RefreshCw, Send, Check } from 'lucide-react';
 
 interface ImageUploaderProps {
     onMealAdded: (data: { imageBase64?: string; text?: string }) => void;
@@ -9,6 +9,7 @@ interface ImageUploaderProps {
 export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [userInput, setUserInput] = useState('');
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -58,7 +59,7 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
                 ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 const base64Image = canvas.toDataURL('image/jpeg', 0.8);
                 stopCamera();
-                onMealAdded({ imageBase64: base64Image, text: userInput.trim() });
+                setPreviewImage(base64Image);
             }
         }
     };
@@ -78,7 +79,7 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
             const base64Image = event.target?.result as string;
             if (base64Image) {
                 if (isCameraActive) stopCamera();
-                onMealAdded({ imageBase64: base64Image, text: userInput.trim() });
+                setPreviewImage(base64Image);
             }
         };
         reader.readAsDataURL(file);
@@ -89,6 +90,17 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
             if (isCameraActive) stopCamera();
             onMealAdded({ text: userInput.trim() });
         }
+    };
+
+    const handleApproveImage = () => {
+        if (previewImage) {
+            onMealAdded({ imageBase64: previewImage, text: userInput.trim() });
+        }
+    };
+
+    const handleCancelPreview = () => {
+        setPreviewImage(null);
+        // We do not clear user text here, just in case they want to keep writing or retake
     };
 
     const handleClose = () => {
@@ -126,9 +138,11 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
                         />
                     </div>
 
-                    {/* Camera Viewport or Placeholder */}
+                    {/* Image Preview / Camera Viewport */}
                     <div className="relative w-full aspect-square bg-gray-100 rounded-3xl overflow-hidden border-2 border-dashed border-gray-200 flex items-center justify-center shadow-inner group transition-colors hover:border-blue-300">
-                        {isCameraActive ? (
+                        {previewImage ? (
+                            <img src={previewImage} alt="Selected meal" className="w-full h-full object-cover" />
+                        ) : isCameraActive ? (
                             <>
                                 <video
                                     ref={videoRef}
@@ -167,7 +181,24 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
 
                     {/* Action Buttons */}
                     <div className="space-y-4 mt-auto">
-                        {isCameraActive ? (
+                        {previewImage ? (
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={handleCancelPreview}
+                                    className="bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-4 px-3 rounded-2xl transition-all flex justify-center items-center gap-2 cursor-pointer"
+                                >
+                                    <X size={20} className="text-gray-400" />
+                                    <span>Retake</span>
+                                </button>
+                                <button
+                                    onClick={handleApproveImage}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-3 rounded-2xl shadow-lg shadow-blue-200 transition-all flex justify-center items-center gap-2 cursor-pointer"
+                                >
+                                    <Check size={20} />
+                                    <span>Approve & Analyze</span>
+                                </button>
+                            </div>
+                        ) : isCameraActive ? (
                             <button
                                 onClick={captureImage}
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-95 flex justify-center items-center gap-2 text-lg cursor-pointer"
@@ -196,7 +227,7 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
                             </div>
                         )}
 
-                        {!isCameraActive && (
+                        {!isCameraActive && !previewImage && (
                             <>
                                 <div className="relative flex items-center justify-center py-1">
                                     <div className="absolute inset-x-0 h-px bg-gray-100"></div>

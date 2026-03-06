@@ -1,6 +1,7 @@
 import { Home, Book, PlusCircle, Settings, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { ImageUploader } from './ImageUploader';
+import { AnalysisReviewModal } from './AnalysisReviewModal';
 import { GeminiService } from '../services/GeminiService';
 import { useNutrition } from '../hooks/useNutrition';
 
@@ -14,6 +15,7 @@ interface LayoutProps {
 export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutProps) {
     const [isUploaderOpen, setIsUploaderOpen] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [pendingAnalysisResult, setPendingAnalysisResult] = useState<any | null>(null);
     const { addMeal } = useNutrition();
 
     const handleMealAdd = async (data: { imageBase64?: string; text?: string }) => {
@@ -24,25 +26,11 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
             // 1. Send to Gemini
             const analysis = await GeminiService.analyzeFood(data);
 
-            // 2. Format for Google Sheets (adding ID, Date, Time)
-            const now = new Date();
-            const newMeal = {
-                id: crypto.randomUUID(),
-                date: now.toISOString().split('T')[0],
-                time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                foodName: analysis.foodName,
-                calories: analysis.calories,
-                protein: analysis.protein,
-                carbs: analysis.carbs,
-                fat: analysis.fat,
-                comment: data.text
-            };
-
-            // 3. Save to Google Sheets Context
-            await addMeal(newMeal);
-
-            // Switch to diary to see the new meal
-            setActiveTab('dashboard');
+            // 2. Wait for user review instead of adding immediately
+            setPendingAnalysisResult({
+                ...analysis,
+                comment: data.text || ''
+            });
 
         } catch (error) {
             console.error(error);
@@ -51,6 +39,41 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
             setIsAnalyzing(false);
         }
     };
+
+    const handleAnalysisApprove = async (editedResult: any) => {
+        setPendingAnalysisResult(null);
+
+        try {
+            // Format for Google Sheets (adding ID, Date, Time)
+            const now = new Date();
+            const newMeal = {
+                id: crypto.randomUUID(),
+                date: now.toISOString().split('T')[0],
+                time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                foodName: editedResult.foodName,
+                calories: editedResult.calories,
+                protein: editedResult.protein,
+                carbs: editedResult.carbs,
+                fat: editedResult.fat,
+                comment: editedResult.comment
+            };
+
+            // Save to Google Sheets Context
+            await addMeal(newMeal);
+
+            // Switch to dashboard/diary to see the new meal
+            setActiveTab('dashboard');
+
+        } catch (error) {
+            console.error(error);
+            alert('Failed to save the meal. Please try again.');
+        }
+    };
+
+    const handleAnalysisReject = () => {
+        setPendingAnalysisResult(null);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 pb-20 md:pb-0 md:pl-64 flex flex-col font-sans">
             {/* Top Header */}
@@ -132,6 +155,14 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
                 <ImageUploader
                     onMealAdded={handleMealAdd}
                     onCancel={() => setIsUploaderOpen(false)}
+                />
+            )}
+
+            {pendingAnalysisResult && (
+                <AnalysisReviewModal
+                    initialData={pendingAnalysisResult}
+                    onApprove={handleAnalysisApprove}
+                    onReject={handleAnalysisReject}
                 />
             )}
 
