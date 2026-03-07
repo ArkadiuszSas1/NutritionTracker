@@ -27,9 +27,13 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NUTRITIONTRACKER_706C4 }}
+          create_credentials_file: true
+          export_environment_variables: true
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
       - name: Deploy to Firebase
         run: firebase deploy --only functions,hosting --project nutritiontracker-706c4 --non-interactive
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ env.GOOGLE_APPLICATION_CREDENTIALS }}
