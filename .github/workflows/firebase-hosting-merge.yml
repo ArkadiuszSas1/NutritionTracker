@@ -23,11 +23,13 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_CLOUD_FUNCTION_URL: ${{ secrets.VITE_CLOUD_FUNCTION_URL }}
       
-      - name: Deploy to Firebase
-        uses: w9jds/firebase-action@master
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          args: deploy --only functions,hosting
-        env:
-          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NUTRITIONTRACKER_706C4 }}
-          PROJECT_ID: nutritiontracker-706c4
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NUTRITIONTRACKER_706C4 }}
 
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy to Firebase
+        run: firebase deploy --only functions,hosting --project nutritiontracker-706c4 --non-interactive
