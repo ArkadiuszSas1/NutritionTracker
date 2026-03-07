@@ -69,20 +69,35 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
 
     // Handle File Upload
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        if (!file.type.startsWith('image/')) {
-            alert('Please select an image file.');
+        const target = e.target;
+        const file = target.files?.[0];
+        if (!file) {
+            target.value = '';
             return;
         }
 
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file.');
+            target.value = '';
+            return;
+        }
+
+        // 1. Immediately read and show the preview image
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const base64Image = event.target?.result as string;
+            if (base64Image) {
+                if (isCameraActive) stopCamera();
+                setPreviewImage(base64Image);
+            }
+        };
+        reader.readAsDataURL(file);
+
+        // 2. Extract EXIF data asynchronously without blocking the preview
         try {
             const exifData = await exifr.parse(file);
             if (exifData?.DateTimeOriginal) {
-                // EXIF DateTimeOriginal is usually a Date object or parsable string depending on exifr version
                 const dt = new Date(exifData.DateTimeOriginal);
-                // Ensure valid date
                 if (!isNaN(dt.getTime())) {
                     setExtractedDate(dt.toISOString().split('T')[0]);
                     setExtractedTime(dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }));
@@ -95,17 +110,10 @@ export function ImageUploader({ onMealAdded, onCancel }: ImageUploaderProps) {
             console.warn('Could not read EXIF data', err);
             setExtractedDate(undefined);
             setExtractedTime(undefined);
+        } finally {
+            // Reset input value so the same file could be selected again if cancelled
+            target.value = '';
         }
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const base64Image = event.target?.result as string;
-            if (base64Image) {
-                if (isCameraActive) stopCamera();
-                setPreviewImage(base64Image);
-            }
-        };
-        reader.readAsDataURL(file);
     };
 
     const handleTextOnlySubmit = () => {
