@@ -13,12 +13,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm ci && npm run build
+      
+      - name: Build frontend
+        run: npm ci && npm run build
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_CLOUD_FUNCTION_URL: ${{ secrets.VITE_CLOUD_FUNCTION_URL }}
+      
+      - name: Build functions
+        run: |
+          npm ci --prefix functions
+          npm run build --prefix functions
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_NUTRITIONTRACKER_706C4 }}
           projectId: nutritiontracker-706c4
+
