@@ -61,4 +61,110 @@ test.describe('Add Meal Flow', () => {
         await expect(page.getByText('Mocked Apple')).toBeVisible({ timeout: 10000 });
     });
 
+    test('should successfully add a meal from gallery with mocked Gemini response', async ({ page }) => {
+        // 1. Mock the specific Cloud Function endpoint so we don't hit the real Gemini API
+        await page.route('**/analyzeFood*', async (route) => {
+            const request = route.request();
+            if (request.method() === 'POST') {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        foodName: 'Mocked Gallery Apple',
+                        calories: 105,
+                        protein: 0.6,
+                        carbs: 26,
+                        fat: 0.4,
+                        fiber: 4.5,
+                        novaGrade: 1
+                    })
+                });
+            } else {
+                await route.continue();
+            }
+        });
+
+        // 2. Click the 'Add Meal' button (using text that appears in the desktop sidebar)
+        await page.getByRole('button', { name: 'Add Meal' }).click();
+
+        // 3. Upload a dummy image to the gallery input
+        const imageBuffer = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+        await page.locator('input[type="file"]').setInputFiles({
+            name: 'dummy.png',
+            mimeType: 'image/png',
+            buffer: imageBuffer
+        });
+
+        // 4. Wait for the image preview to appear and click 'Approve & Analyze'
+        await expect(page.getByRole('button', { name: 'Approve & Analyze' })).toBeVisible();
+        await page.getByRole('button', { name: 'Approve & Analyze' }).click();
+
+        // 5. Wait for the Review Analysis modal to appear and assert the mocked values
+        await expect(page.getByText('Review Analysis')).toBeVisible({ timeout: 10000 });
+
+        // Check that the mocked food name was populated
+        await expect(page.locator('div').filter({ hasText: /^Food Name$/ }).locator('input')).toHaveValue('Mocked Gallery Apple');
+
+        // 6. Approve the analysis
+        await page.getByRole('button', { name: 'Approve' }).click();
+
+        // 7. Verify the modal closes and the meal appears on the dashboard
+        await expect(page.getByText('Review Analysis')).not.toBeVisible();
+        await expect(page.getByText('Mocked Gallery Apple')).toBeVisible({ timeout: 10000 });
+    });
+
+    test('should successfully add a meal from camera with mocked Gemini response', async ({ page }) => {
+        // Grant camera permissions
+        await page.context().grantPermissions(['camera']);
+
+        // 1. Mock the specific Cloud Function endpoint so we don't hit the real Gemini API
+        await page.route('**/analyzeFood*', async (route) => {
+            const request = route.request();
+            if (request.method() === 'POST') {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        foodName: 'Mocked Camera Apple',
+                        calories: 110,
+                        protein: 0.7,
+                        carbs: 27,
+                        fat: 0.5,
+                        fiber: 4.6,
+                        novaGrade: 1
+                    })
+                });
+            } else {
+                await route.continue();
+            }
+        });
+
+        // 2. Click the 'Add Meal' button
+        await page.getByRole('button', { name: 'Add Meal' }).click();
+
+        // 3. Click 'Open Camera'
+        await page.getByRole('button', { name: 'Open Camera' }).click();
+
+        // 4. Wait for video to be visible and click 'Take Photo'
+        await expect(page.locator('video')).toBeVisible();
+        await page.getByRole('button', { name: 'Take Photo' }).click();
+
+        // 5. Wait for the image preview to appear and click 'Approve & Analyze'
+        await expect(page.getByRole('button', { name: 'Approve & Analyze' })).toBeVisible();
+        await page.getByRole('button', { name: 'Approve & Analyze' }).click();
+
+        // 6. Wait for the Review Analysis modal to appear and assert the mocked values
+        await expect(page.getByText('Review Analysis')).toBeVisible({ timeout: 10000 });
+
+        // Check that the mocked food name was populated
+        await expect(page.locator('div').filter({ hasText: /^Food Name$/ }).locator('input')).toHaveValue('Mocked Camera Apple');
+
+        // 7. Approve the analysis
+        await page.getByRole('button', { name: 'Approve' }).click();
+
+        // 8. Verify the modal closes and the meal appears on the dashboard
+        await expect(page.getByText('Review Analysis')).not.toBeVisible();
+        await expect(page.getByText('Mocked Camera Apple')).toBeVisible({ timeout: 10000 });
+    });
+
 });
