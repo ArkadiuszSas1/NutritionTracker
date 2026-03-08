@@ -25,4 +25,26 @@ test.describe('Authentication Flow', () => {
         await expect(page.getByText('Calories Eaten')).toBeVisible();
     });
 
+    test('should register successfully with a new user', async ({ page }) => {
+        // Navigate to the app (which redirects to login if unauthenticated)
+        await page.goto('/');
+
+        // Check we are on the login screen
+        await expect(page.getByText('Nutrition Tracker')).toBeVisible();
+
+        // Switch to registration mode
+        await page.getByRole('button', { name: "Don't have an account? Register" }).click();
+
+        // Fill in the registration form with a unique email
+        const uniqueEmail = `testuser_${Date.now()}@test.com`;
+        await page.getByRole('textbox', { name: "Enter your email" }).fill(uniqueEmail);
+        await page.getByPlaceholder('Enter your password').fill('password123');
+
+        // Click the Create Account button
+        await page.getByRole('button', { name: 'Create Account' }).click();
+
+        // After registration, we should see the dashboard.
+        await expect(page.getByText('Calories Eaten')).toBeVisible({ timeout: 10000 });
+    });
+
 });
