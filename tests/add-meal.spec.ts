@@ -50,8 +50,24 @@ test.describe('Add Meal Flow', () => {
         // 5. Wait for the Review Analysis modal to appear and assert the mocked values
         await expect(page.getByText('Review Analysis')).toBeVisible();
 
-        // Check that the mocked food name was populated
+        // Check that the mocked fields are populated
         await expect(page.locator('div').filter({ hasText: /^Food Name$/ }).locator('input')).toHaveValue('Mocked Apple');
+        await expect(page.locator('div').filter({ hasText: /^Calories \(kcal\)$/ }).locator('input')).toHaveValue('95');
+        await expect(page.locator('div').filter({ hasText: /^Protein \(g\)$/ }).locator('input')).toHaveValue('0.5');
+        await expect(page.locator('div').filter({ hasText: /^Carbs \(g\)$/ }).locator('input')).toHaveValue('25');
+        await expect(page.locator('div').filter({ hasText: /^Fat \(g\)$/ }).locator('input')).toHaveValue('0.3');
+        await expect(page.locator('div').filter({ hasText: /^NOVA Grade \(1-4\)$/ }).locator('input')).toHaveValue('1');
+        await expect(page.locator('div').filter({ hasText: /^Fiber \(g\)$/ }).locator('input')).toHaveValue('4.4');
+
+        await expect(page.locator('div').filter({ hasText: /^Glycemic Load$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Net Carbs \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Added Sugar \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('textarea')).toHaveValue('I ate a large honeycrisp apple');
 
         // 6. Approve the analysis
         await page.getByRole('button', { name: 'Approve' }).click();
@@ -102,8 +118,24 @@ test.describe('Add Meal Flow', () => {
         // 5. Wait for the Review Analysis modal to appear and assert the mocked values
         await expect(page.getByText('Review Analysis')).toBeVisible({ timeout: 10000 });
 
-        // Check that the mocked food name was populated
+        // Check that the mocked fields are populated
         await expect(page.locator('div').filter({ hasText: /^Food Name$/ }).locator('input')).toHaveValue('Mocked Gallery Apple');
+        await expect(page.locator('div').filter({ hasText: /^Calories \(kcal\)$/ }).locator('input')).toHaveValue('105');
+        await expect(page.locator('div').filter({ hasText: /^Protein \(g\)$/ }).locator('input')).toHaveValue('0.6');
+        await expect(page.locator('div').filter({ hasText: /^Carbs \(g\)$/ }).locator('input')).toHaveValue('26');
+        await expect(page.locator('div').filter({ hasText: /^Fat \(g\)$/ }).locator('input')).toHaveValue('0.4');
+        await expect(page.locator('div').filter({ hasText: /^NOVA Grade \(1-4\)$/ }).locator('input')).toHaveValue('1');
+        await expect(page.locator('div').filter({ hasText: /^Fiber \(g\)$/ }).locator('input')).toHaveValue('4.5');
+
+        await expect(page.locator('div').filter({ hasText: /^Glycemic Load$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Net Carbs \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Added Sugar \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('textarea')).toHaveValue('');
 
         // 6. Approve the analysis
         await page.getByRole('button', { name: 'Approve' }).click();
@@ -156,8 +188,24 @@ test.describe('Add Meal Flow', () => {
         // 6. Wait for the Review Analysis modal to appear and assert the mocked values
         await expect(page.getByText('Review Analysis')).toBeVisible({ timeout: 10000 });
 
-        // Check that the mocked food name was populated
+        // Check that the mocked fields are populated
         await expect(page.locator('div').filter({ hasText: /^Food Name$/ }).locator('input')).toHaveValue('Mocked Camera Apple');
+        await expect(page.locator('div').filter({ hasText: /^Calories \(kcal\)$/ }).locator('input')).toHaveValue('110');
+        await expect(page.locator('div').filter({ hasText: /^Protein \(g\)$/ }).locator('input')).toHaveValue('0.7');
+        await expect(page.locator('div').filter({ hasText: /^Carbs \(g\)$/ }).locator('input')).toHaveValue('27');
+        await expect(page.locator('div').filter({ hasText: /^Fat \(g\)$/ }).locator('input')).toHaveValue('0.5');
+        await expect(page.locator('div').filter({ hasText: /^NOVA Grade \(1-4\)$/ }).locator('input')).toHaveValue('1');
+        await expect(page.locator('div').filter({ hasText: /^Fiber \(g\)$/ }).locator('input')).toHaveValue('4.6');
+
+        await expect(page.locator('div').filter({ hasText: /^Glycemic Load$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Net Carbs \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Added Sugar \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Comment$/ }).locator('textarea')).toHaveValue('');
 
         // 7. Approve the analysis
         await page.getByRole('button', { name: 'Approve' }).click();

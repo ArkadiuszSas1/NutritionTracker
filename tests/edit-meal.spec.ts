@@ -54,17 +54,36 @@ test.describe('Edit Meal Flow', () => {
         // 4. Wait for Edit Meal modal
         await expect(page.getByText('Edit Meal')).toBeVisible({ timeout: 10000 });
 
-        // 5. Change the food name and calories
+        // 5. Verify all the fields are populated correctly from the mock
+        await expect(page.locator('div').filter({ hasText: /^Food Name$/ }).locator('input')).toHaveValue('Test Meal To Edit');
+        await expect(page.locator('div').filter({ hasText: /^Calories \(kcal\)$/ }).locator('input')).toHaveValue('500');
+        await expect(page.locator('div').filter({ hasText: /^Protein \(g\)$/ }).locator('input')).toHaveValue('20');
+        await expect(page.locator('div').filter({ hasText: /^Carbs \(g\)$/ }).locator('input')).toHaveValue('50');
+        await expect(page.locator('div').filter({ hasText: /^Fat \(g\)$/ }).locator('input')).toHaveValue('10');
+        await expect(page.locator('div').filter({ hasText: /^NOVA Grade \(1-4\)$/ }).locator('input')).toHaveValue('2');
+        await expect(page.locator('div').filter({ hasText: /^Fiber \(g\)$/ }).locator('input')).toHaveValue('5');
+
+        await expect(page.locator('div').filter({ hasText: /^Glycemic Load$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Net Carbs \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Added Sugar \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
+        await expect(page.locator('textarea')).toHaveValue('Test Meal To Edit');
+
+        // 6. Change the food name and calories
         const nameInput = page.locator('div').filter({ hasText: /^Food Name$/ }).locator('input');
         await nameInput.fill('Edited Test Meal');
 
         const caloriesInput = page.locator('div').filter({ hasText: /^Calories \(kcal\)$/ }).locator('input');
         await caloriesInput.fill('600');
 
-        // 6. Save changes
+        // 7. Save changes
         await page.getByRole('button', { name: 'Save Changes' }).click();
 
-        // 7. Verify modal closes and new text is visible
+        // 8. Verify modal closes and new text is visible
         await expect(page.getByText('Edit Meal')).not.toBeVisible();
         await expect(page.locator('h4').filter({ hasText: /Edited Test Meal/i }).first()).toBeVisible({ timeout: 10000 });
 
