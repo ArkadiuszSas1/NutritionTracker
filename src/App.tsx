@@ -1,45 +1,50 @@
-import { useState } from 'react';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { Dashboard } from './components/Dashboard';
 import { Diary } from './components/Diary';
 import { Login } from './components/Login';
 import { NutritionProvider } from './hooks/useNutrition';
-
-// Using a placeholder Client ID if one is not provided in env vars.
-// The user must configure this later in Netlify or their local .env file.
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+import { auth } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'diary'>('dashboard');
-  const [accessToken, setAccessToken] = useState<string | null>(() => localStorage.getItem('google_access_token'));
+  const [userId, setUserId] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  const handleSetToken = (token: string) => {
-    localStorage.setItem('google_access_token', token);
-    setAccessToken(token);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserId(user.uid);
+      } else {
+        setUserId(null);
+      }
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    setUserId(null);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('google_access_token');
-    setAccessToken(null);
-  };
+  if (authLoading) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    </div>;
+  }
 
-  if (!accessToken) {
-    return (
-      <GoogleOAuthProvider clientId={CLIENT_ID}>
-        <Login onSuccess={handleSetToken} />
-      </GoogleOAuthProvider>
-    );
+  if (!userId) {
+    return <Login onSuccess={setUserId} />;
   }
 
   return (
-    <GoogleOAuthProvider clientId={CLIENT_ID}>
-      <NutritionProvider accessToken={accessToken}>
-        <Layout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout}>
-          {activeTab === 'dashboard' ? <Dashboard /> : <Diary />}
-        </Layout>
-      </NutritionProvider>
-    </GoogleOAuthProvider>
+    <NutritionProvider userId={userId}>
+      <Layout activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout}>
+        {activeTab === 'dashboard' ? <Dashboard /> : <Diary />}
+      </Layout>
+    </NutritionProvider>
   );
 }
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { GoogleSheetsService } from '../services/GoogleSheetsService';
+import { FirestoreService } from '../services/FirestoreService';
 import type { MealEntry } from '../types';
 
 interface NutritionContextType {
@@ -16,42 +16,43 @@ const NutritionContext = createContext<NutritionContextType | undefined>(undefin
 
 export function NutritionProvider({
     children,
-    accessToken
+    userId
 }: {
     children: React.ReactNode;
-    accessToken: string;
+    userId: string;
 }) {
     const [meals, setMeals] = useState<MealEntry[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [service, setService] = useState<GoogleSheetsService | null>(null);
+    const [service, setService] = useState<FirestoreService | null>(null);
 
     useEffect(() => {
         const initService = async () => {
             try {
                 setIsLoading(true);
-                const newService = new GoogleSheetsService(accessToken);
-                await newService.initialize();
+                const newService = new FirestoreService(userId);
                 setService(newService);
 
                 const fetchedMeals = await newService.getMeals();
                 setMeals(fetchedMeals);
             } catch (err) {
-                setError('Failed to connect to Google Sheets.');
+                setError('Failed to connect to Firestore.');
                 console.error(err);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        initService();
-    }, [accessToken]);
+        if (userId) {
+            initService();
+        }
+    }, [userId]);
 
     const addMeal = useCallback(async (meal: MealEntry) => {
         if (!service) throw new Error('Service not initialized');
 
         // Optimistic UI update
-        setMeals(prev => [...prev, meal]);
+        setMeals(prev => [meal, ...prev]);
 
         try {
             await service.addMeal(meal);
