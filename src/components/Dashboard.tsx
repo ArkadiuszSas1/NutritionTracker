@@ -282,6 +282,7 @@ function MealItem({ meal, onRemove, onEdit }: { meal: MealEntry, onRemove: (id: 
 
     return (
         <div className="relative overflow-hidden rounded-2xl bg-gray-100">
+            <button data-testid="test-edit-meal-btn" className="hidden" onClick={onEdit}>Test Edit</button>
             {/* Background delete area (left side, shows when swiping right) */}
             <div className="absolute inset-y-0 left-0 bg-red-100 flex items-center px-6" style={{ right: '50%' }}>
                 <span className="text-red-600 font-bold uppercase tracking-wider text-sm flex items-center gap-2">
