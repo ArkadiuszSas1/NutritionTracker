@@ -204,3 +204,10 @@ The Gemini API key is **never stored in the frontend code**. It lives securely i
    firebase functions:secrets:set GEMINI_API_KEY
    # Paste your key when prompted
    ```
+
+---
+
+## Agent Instructions
+
+- **Terminal Commands**: When executing multiple commands in the terminal, use `;` as a separator instead of `&&`.
+- **Reason**: The development environment uses PowerShell (windows), and older versions do not support the `&&` operator.

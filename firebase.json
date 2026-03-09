@@ -46,5 +46,11 @@
       "port": 4000
     },
     "singleProjectMode": true
+  },
+  "firestore": {
+    "database": "nutritiontracker",
+    "location": "europe-central2",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   }
 }

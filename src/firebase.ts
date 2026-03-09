@@ -15,7 +15,8 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const db = initializeFirestore(app, { ignoreUndefinedProperties: true });
+const databaseId = import.meta.env.VITE_FIREBASE_DATABASE_ID || "nutritiontracker";
+export const db = initializeFirestore(app, { ignoreUndefinedProperties: true }, databaseId);
 export const auth = getAuth(app);
 export const functions = getFunctions(app);
 

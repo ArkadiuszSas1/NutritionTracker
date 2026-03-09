@@ -9,7 +9,7 @@ admin.initializeApp({
 });
 
 const auth = admin.auth();
-const db = admin.firestore();
+const db = admin.firestore("nutritiontracker");
 
 async function seedDatabase() {
     console.log('🌱 Starting database seed script...\n');
