@@ -18,7 +18,6 @@ export interface MealEntry {
     saturatedFat?: number;
     monounsaturatedFat?: number;
     polyunsaturatedFat?: number;
-    omega36Ratio?: string; // e.g. "1:4"
     glycemicLoad?: number;
     energyImpact?: string; // e.g. "Sustained" or "Crash"
 }

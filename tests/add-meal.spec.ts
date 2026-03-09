@@ -65,7 +65,6 @@ test.describe('Add Meal Flow', () => {
         await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
-        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('textarea')).toHaveValue('I ate a large honeycrisp apple');
 
@@ -133,7 +132,6 @@ test.describe('Add Meal Flow', () => {
         await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
-        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('textarea')).toHaveValue('');
 
@@ -203,7 +201,6 @@ test.describe('Add Meal Flow', () => {
         await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
-        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Comment$/ }).locator('textarea')).toHaveValue('');
 

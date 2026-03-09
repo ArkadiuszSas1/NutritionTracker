@@ -69,7 +69,6 @@ test.describe('Edit Meal Flow', () => {
         await expect(page.locator('div').filter({ hasText: /^Sat Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Mono Fat \(g\)$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Poly Fat \(g\)$/ }).locator('input')).toHaveValue('');
-        await expect(page.locator('div').filter({ hasText: /^Omega 3:6$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('div').filter({ hasText: /^Energy Impact$/ }).locator('input')).toHaveValue('');
         await expect(page.locator('textarea')).toHaveValue('Test Meal To Edit');
 
