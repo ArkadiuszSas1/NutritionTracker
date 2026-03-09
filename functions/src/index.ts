@@ -86,7 +86,6 @@ export const analyzeFood = onRequest({
               "saturatedFat": number,
               "monounsaturatedFat": number,
               "polyunsaturatedFat": number,
-              "omega36Ratio": "string representing ratio e.g. '1:4'",
               "glycemicLoad": number (estimate),
               "energyImpact": "string e.g. 'Sustained' or 'Crash' based on macros/sugar"
             }

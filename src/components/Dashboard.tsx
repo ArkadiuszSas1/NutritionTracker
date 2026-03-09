@@ -44,12 +44,6 @@ export function Dashboard() {
         novaCount: acc.novaCount + (meal.novaGrade ? 1 : 0)
     }), { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, netCarbs: 0, addedSugars: 0, saturatedFat: 0, monounsaturatedFat: 0, polyunsaturatedFat: 0, novaSum: 0, novaCount: 0 });
 
-    // Derive a daily omega-3/6 ratio summary from per-meal values
-    const omega36Ratios = todaysMeals
-        .map(m => m.omega36Ratio)
-        .filter((r): r is string => !!r);
-    const dailyOmega36 = omega36Ratios.length > 0 ? omega36Ratios.join(', ') : null;
-
     const avgNova = totals.novaCount > 0 ? (totals.novaSum / totals.novaCount).toFixed(1) : '-';
 
     // Goals (could be user-configurable later)
@@ -190,12 +184,6 @@ export function Dashboard() {
                     <BreakdownRow label="Saturated" value={totals.saturatedFat} unit="g" target={GOALS.satFat} colorClass="text-red-500" />
                     <BreakdownRow label="Monounsaturated" value={totals.monounsaturatedFat} unit="g" />
                     <BreakdownRow label="Polyunsaturated" value={totals.polyunsaturatedFat} unit="g" />
-                    {dailyOmega36 && (
-                        <div className="flex items-center justify-between py-1.5">
-                            <span className="text-xs font-semibold text-gray-500">Omega‑3/6 Ratio</span>
-                            <span className="text-sm font-bold text-indigo-600">{dailyOmega36}</span>
-                        </div>
-                    )}
                 </BreakdownPanel>
             </div>
 

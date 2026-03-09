@@ -18,7 +18,6 @@ interface AnalysisReviewModalProps {
         saturatedFat?: number;
         monounsaturatedFat?: number;
         polyunsaturatedFat?: number;
-        omega36Ratio?: string;
         glycemicLoad?: number;
         energyImpact?: string;
     };
@@ -38,7 +37,6 @@ interface AnalysisReviewModalProps {
         saturatedFat?: number;
         monounsaturatedFat?: number;
         polyunsaturatedFat?: number;
-        omega36Ratio?: string;
         glycemicLoad?: number;
         energyImpact?: string;
     }) => void;
@@ -61,7 +59,6 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
     const [saturatedFat, setSaturatedFat] = useState(initialData.saturatedFat?.toString() || '');
     const [monounsaturatedFat, setMonounsaturatedFat] = useState(initialData.monounsaturatedFat?.toString() || '');
     const [polyunsaturatedFat, setPolyunsaturatedFat] = useState(initialData.polyunsaturatedFat?.toString() || '');
-    const [omega36Ratio, setOmega36Ratio] = useState(initialData.omega36Ratio || '');
     const [glycemicLoad, setGlycemicLoad] = useState(initialData.glycemicLoad?.toString() || '');
     const [energyImpact, setEnergyImpact] = useState(initialData.energyImpact || '');
 
@@ -82,7 +79,6 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
             saturatedFat: saturatedFat ? Number(saturatedFat) : undefined,
             monounsaturatedFat: monounsaturatedFat ? Number(monounsaturatedFat) : undefined,
             polyunsaturatedFat: polyunsaturatedFat ? Number(polyunsaturatedFat) : undefined,
-            omega36Ratio: omega36Ratio.trim() || undefined,
             glycemicLoad: glycemicLoad ? Number(glycemicLoad) : undefined,
             energyImpact: energyImpact.trim() || undefined,
         });
@@ -225,11 +221,7 @@ export function AnalysisReviewModal({ initialData, onApprove, onReject }: Analys
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Omega 3:6</label>
-                            <input type="text" placeholder="e.g. 1:4" value={omega36Ratio} onChange={(e) => setOmega36Ratio(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700" />
-                        </div>
+                    <div className="grid grid-cols-1 gap-4">
                         <div className="space-y-1">
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Energy Impact</label>
                             <input type="text" placeholder="e.g. Sustained" value={energyImpact} onChange={(e) => setEnergyImpact(e.target.value)} className="w-full bg-blue-50/50 border border-blue-100 rounded-xl p-3 text-gray-700" />

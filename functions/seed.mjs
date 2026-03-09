@@ -77,7 +77,6 @@ async function seedDatabase() {
                 protein: 45,
                 carbs: 40,
                 fat: 28,
-                omega36Ratio: '2:1',
                 novaGrade: 1
             }
         ];

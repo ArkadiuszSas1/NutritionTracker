@@ -68,7 +68,6 @@ export function Layout({ children, activeTab, setActiveTab, onLogout }: LayoutPr
                 saturatedFat: editedResult.saturatedFat,
                 monounsaturatedFat: editedResult.monounsaturatedFat,
                 polyunsaturatedFat: editedResult.polyunsaturatedFat,
-                omega36Ratio: editedResult.omega36Ratio,
                 glycemicLoad: editedResult.glycemicLoad,
                 energyImpact: editedResult.energyImpact
             };
